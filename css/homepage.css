@@ -1,0 +1,16 @@
+.category{
+    background-color: #ff0040;
+    margin : 20px 300px;
+    font-family: "Lato", sans-serif;
+    font-size: 40px;
+}
+
+.category:hover{
+    background-color: orange;
+    margin : 30px 400px;
+}
+
+.category:focus{
+    font-size: 90px;
+}
+

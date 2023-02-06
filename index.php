@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous"></script>
     <script src="http://code.jquery.com/jquery-3.6.3.min.js"></script>
-    <script type="text/javascript" src= 'http://localhost/Web_App_User/js/setProductQuanity.js'></script>
+    <script type="text/javascript" src= 'http://localhost/Web_App_User/js/checkLogin.js'></script>
   <script type="text/javascript">
     var modal = document.getElementById('id01').style.display = 'none';
     document.getElementById('id01').focus();

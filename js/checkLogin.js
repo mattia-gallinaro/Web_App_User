@@ -6,7 +6,7 @@ $(document).ready(function(){
         session = data;
     })
     if(session == null && document.URL != 'http://localhost/Web_App_User/pages/login.php') {
-        window.location.href = 'http://localhost/Web_App_User/pages/login.php';
+        //window.location.href = 'http://localhost/Web_App_User/pages/login.php';
     }
 
 });
