@@ -8,6 +8,7 @@
 .category:hover{
     background-color: orange;
     margin : 30px 400px;
+    background-image: url("http://localhost/Web_App_User/images/panino_piu_piccolo.jpg");
 }
 
 .category:focus{

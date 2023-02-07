@@ -94,3 +94,12 @@ body {font-family: "Lato", sans-serif;}
   .sidebar {padding-top: 15px;}
   .sidebar a {font-size: 18px;}
 }
+
+
+@media screen and (max-height: 450px) {
+  
+}
+
+@media screen and (min-width: 768px){
+  
+}
