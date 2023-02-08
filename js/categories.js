@@ -9,7 +9,7 @@ function callCategory(){
     var req  = new XMLHttpRequest();
     req.onreadystatechange = function(){
         if(this.readyState == this.DONE){
-            console.log(req.responseText);
+            //console.log(req.responseText);
             getCategory(req.responseText);
         }
     }
@@ -23,9 +23,9 @@ function getCategory(response){
         var element = document.createElement("div");
         element.classList.add("category");
         element.setAttribute('value', json_decoddate[i].id);
-        console.log(element.innerHTML);
+        //console.log(element.innerHTML);
         element.addEventListener("click", function(){
-            window.location.reload();
+            window.location.replace = "http://localhost/Web_App_User/pages/list.php?id=" + json_decoddate[i].id;
         })
         element.textContent = json_decoddate[i].name;
         parent_cat.appendChild(element);
