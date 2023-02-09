@@ -1,15 +1,16 @@
-let form_log = null;
 let email_box = null;
 let paswd_box = null;
+let btn_log = null;
 $(document).ready(function() {
-    form_log = document.getElementById('name');
-    email_box = document.getElementById('email');
-    paswd_box = document.getElementById('password');
+    btn_log = document.getElementById('subm_log');
+    btn_log.addEventListener('click', login());
+    email_box = document.getElementById('email_ut');
+    paswd_box = document.getElementById('passwd_ut');
 });
 
 
 async function login(){
-    const json =  "{ id : " + email_box.textContent + ", password : " + paswd_box.textContent +"}";
+    const json = {email: email_box.value, password: passwd_box.value};
     const response = await fetch("http://localhost/food-api/API/user/login.php", {
         method: 'POST',
         headers: {
@@ -18,5 +19,6 @@ async function login(){
         body  : JSON.stringify(json)
     }).then((response) =>{
         response.JSON();
-    }).then((data)=> console.log(data));
+    }).then((data)=> {return (data)});
+    console.log(response);
 }

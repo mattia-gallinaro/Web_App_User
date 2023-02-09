@@ -10,3 +10,14 @@ $(document).ready(function(){
     }
 
 });
+
+export function checkSession(session){
+    $.get('/php/getSessions.php', function(data){
+        console.log(data);
+        session = data;
+        return session;
+    })
+    if(session == null && document.URL != 'http://localhost/Web_App_User/pages/login.php') {
+        return -1;
+    }
+}
