@@ -21,3 +21,7 @@ export function checkSession(session){
         return -1;
     }
 }
+
+export function deleteSession(session){
+    $.post('/php/deleteSessions.php', function(data){});
+}
