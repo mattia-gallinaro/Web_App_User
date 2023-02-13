@@ -26,8 +26,13 @@ function showProducts(products){
     else{
         for(var i = 0; i < products.length; i++){
             const element = document.createElement('div');
+            element.setAttribute('class', 'product');
+            element.setAttribute('value', products[i].id);
             element.innerHTML = products[i].name + ' ' + products[i].price + ' ' + products[i].description;
             content_parent.appendChild(element);
+            var this_el = document.getElementsByClassName('product');
+            var image = products[i].
+            this_el[length(this_el) - 1].appendChild();
         }
     }
 }
