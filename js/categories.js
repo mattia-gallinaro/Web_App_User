@@ -66,50 +66,65 @@ async function getProducts(id) {
   return response;
 }
 
-function getImageUrl(cat){
+function getImageUrl(cat) {
   //let url = null;
   console.log(cat);
-  switch(cat) {
-    case '3':
+  switch (cat) {
+    case "3":
       return "/Web_App_User/images/piadina.jpg";
       break;
-    case '2':
+    case "2":
       return "/Web_App_User/images/CocaLatt.jpg";
-      break; 
-    case '1':
+      break;
+    case "1":
       return "/Web_App_User/images/panino.jpg";
-      break; 
-    case '5':
+      break;
+    case "5":
       return "/Web_App_User/images/snack.jpg";
-      break; 
-    case '4':
+      break;
+    case "4":
       return "/Web_App_User/images/brioches.jpg";
       break;
-      
+
     default:
       return "";
-    }
-    //console.log(url);
-    //return url;
+  }
+  //console.log(url);
+  //return url;
 }
 
-function showProducts(products){
+function showProducts(products) {
   const element = document.createElement("div");
   element.classList.add("all-products");
   parent_cat.appendChild(element);
   console.log(products);
   var url = getImageUrl(products[0].tag);
   //console.log(url);
-  for(var i = 0; i < products.length; i++) {
-    var just_one  = document.createElement("div");
-    just_one.classList.add('product');
-    just_one.innerHTML = '<img src='+url +'><div class="product-info"><h4 class="product-title">'+ products[i].name+'</h4><p class="product-price">€2.00</p><button class="btn_quantity" value="'+ products[i].id +'" onclick="addQuantity('+ products[i].id +')">+</button><a id="'+ products[i].id +'">0</a><button class="btn_quantity" onclick="removeQuantity('+ products[i].id +')">-</button><button class="product-btn" onclick="orderProduct('+products[i].id+')">Buy Now</button></div>';
+  for (var i = 0; i < products.length; i++) {
+    var just_one = document.createElement("div");
+    just_one.classList.add("product");
+    just_one.innerHTML =
+      "<img src=" +
+      url +
+      '><div class="product-info"><h4 class="product-title">' +
+      products[i].name +
+      '</h4><p class="product-price">€'+products[i].price+
+      '</p><button class="btn_quantity" value="' +
+      products[i].id +
+      '" onclick="addQuantity(' +
+      products[i].id +
+      ')">+</button><a id="' +
+      products[i].id +
+      '">0</a><button class="btn_quantity" onclick="removeQuantity(' +
+      products[i].id +
+      ')">-</button><button class="product-btn" onclick="orderProduct(' +
+      products[i].id +
+      ')">Buy Now</button></div>';
     element.appendChild(just_one);
   }
 }
 
-
-function addQuantity(id){
+function addQuantity(id) {
   var element = document.getElementById(id);
   var value = parseInt(element.textContent);
   value++;
@@ -117,23 +132,73 @@ function addQuantity(id){
   element.textContent = value.toString();
 }
 
-function removeQuantity(id){
+function removeQuantity(id) {
   var element = document.getElementById(id);
   var value = parseInt(element.textContent);
-  if(value > 0){
+  if (value > 0) {
     value--;
   }
   //console.log(value);
   element.textContent = value.toString();
 }
 
-function orderProduct(id){
+function orderProduct(id) {
   var element = document.getElementById(id);
-  if(parseInt(element.textContent) != 0){
+  if (parseInt(element.textContent) != 0) {
     addProductCart(value_session, id, parseInt(element.textContent));
   }
 }
 
+async function showCart() {
+  parent_cat.innerHTML = null;
+  var response = await fetch(
+    "http://localhost/food-api/API/cart/getCart.php?user=" + value_session
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      return data;
+    });
+  return response;
+}
+
+function showCartUser() {
+  if (value_session == null || value_session == 0) {
+    showLogin();
+  } else {
+    var cart = showCart().then((response) => {
+      {
+        const element = document.createElement("div");
+        element.classList.add("all-products");
+        parent_cat.appendChild(element);
+        console.log(response);
+        for (var i = 0; i < response.length; i++) {
+          var url = getImageUrl(response[i].tag_id);
+          var just_one = document.createElement("div");
+          just_one.classList.add("product");
+          just_one.innerHTML =
+            "<img src=" +
+            url +
+            '><div class="product-info"><h4 class="product-title">' +
+            response[i].name +
+            '</h4><p class="product-price">€'+response[i].price+
+            '</p><button class="btn_quantity" value="' +
+            response[i].product +
+            '" onclick="addQuantity(' +
+            response[i].product +
+            ')">+</button><a id="' +
+            response[i].product +
+            '">'+response[i].quantity+
+            '</a><button class="btn_quantity" onclick="removeQuantity(' +
+            response[i].product +
+            ')">-</button><button class="product-btn" onclick="orderProduct(' +
+            response[i].product +
+            ')">Buy Now</button></div>';
+          element.appendChild(just_one);
+        }
+      }
+    });
+  }
+}
 // method: 'POST',
 //          headers: {
 //           'Content-Type': 'application/json',
@@ -193,9 +258,7 @@ function showLogin() {
   }
 }
 
-function showLoginForm() {
-  
-}
+function showLoginForm() {}
 
 function showRegistrationForm() {}
 
@@ -203,25 +266,4 @@ function showCardUser() {
   const element = document.createElement("div");
   element.innerHTML = "i wanna die";
   parent_cat.appendChild(element);
-}
-
-function showCart() {
-  parent_cat.innerHTML = null;
-  var response = fetch(
-    "http://localhost/food-api/API/cart/getCart.php?user=" + 1
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      data.map(function (data) {
-        console.log(data.description);
-        const element = document.createElement("div");
-        element.textContent = data.description;
-        parent_cat.appendChild(element);
-      });
-      //console.log('Success:', data);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
 }

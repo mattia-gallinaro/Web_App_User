@@ -35,7 +35,7 @@
                 <span class="tooltip">Casetta</span>
             </li>
             <li>
-                <a id="cart" onclick="showCart()">
+                <a id="cart" onclick="showCartUser()">
                     <i class="bx bx-cart bx-tada-hover"></i>
                     <span class="title">Carrello</span>
                 </a>
