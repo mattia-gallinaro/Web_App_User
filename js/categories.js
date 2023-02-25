@@ -5,7 +5,7 @@ $(document).ready(function () {
   console.log("Worka");
   parent_cat = document.getElementById("content");
   btn_cart = document.getElementById("cart");
-  btn_cart.addEventListener("click", showCart());
+  //btn_cart.addEventListener("click", showCart());
   callCategory();
   //showCart();
 });
@@ -66,63 +66,71 @@ async function getProducts(id) {
   return response;
 }
 
-function showProducts(products) {
-  if (products.length == 1) {
-    const element = document.createElement("div");
-    element.innerHTML = "Non ci sono prodotti";
-  } else {
-    for (var i = 0; i < products.length; i++) {
-      const element = document.createElement("div");
-      element.setAttribute("class", "product");
-      element.setAttribute("value", products[i].id);
-      parent_cat.appendChild(element);
-      const text = document.createElement("p");
-      text.innerHTML =
-        products[i].name +
-        " " +
-        products[i].price +
-        " " +
-        products[i].description;
-      element.appendChild(text);
-      if (value_session == 1) {
-        const btn_plus = document.createElement("button");
-        btn_plus.innerHTML = "+";
-        btn_plus.addEventListener("click", function () {
-          var value = parseInt(qnt.innerHTML);
-          value++;
-          console.log(value);
-          qnt.innerHTML = value.toString();
-        });
-        element.appendChild(btn_plus);
-        const qnt = document.createElement("div");
-        qnt.innerHTML += 0;
-        element.appendChild(qnt);
-        const btn_less = document.createElement("button");
-        btn_less.addEventListener("click", function () {
-          var value = parseInt(qnt.innerHTML);
-          if (value > 0) {
-            value--;
-          }
-          console.log(value);
-          qnt.innerHTML = value.toString();
-        });
-        btn_less.innerHTML = "-";
-        element.appendChild(btn_less);
-        const order = document.createElement("button");
-        order.addEventListener("click", function () {
-          if (parseInt(qnt.textContent) != 0) {
-            addProductCart(
-              value_session,
-              element.getAttribute("value"),
-              parseInt(qnt.textContent)
-            );
-          }
-          //showCart();
-        });
-        order.innerHTML = "ORDINA ORDINAA";
-        element.appendChild(order);
-      }
+function getImageUrl(cat){
+  //let url = null;
+  console.log(cat);
+  switch(cat) {
+    case '3':
+      return "/Web_App_User/images/piadina.jpg";
+      break;
+    case '2':
+      return "/Web_App_User/images/CocaLatt.jpg";
+      break; 
+    case '1':
+      return "/Web_App_User/images/panino.jpg";
+      break; 
+    case '5':
+      return "/Web_App_User/images/snack.jpg";
+      break; 
+    case '4':
+      return "/Web_App_User/images/brioches.jpg";
+      break;
+      
+    default:
+      return "";
     }
+    //console.log(url);
+    //return url;
+}
+
+function showProducts(products){
+  const element = document.createElement("div");
+  element.classList.add("all-products");
+  parent_cat.appendChild(element);
+  console.log(products);
+  var url = getImageUrl(products[0].tag);
+  //console.log(url);
+  for(var i = 0; i < products.length; i++) {
+    var just_one  = document.createElement("div");
+    just_one.classList.add('product');
+    just_one.innerHTML = '<img src='+url +'><div class="product-info"><h4 class="product-title">'+ products[i].name+'</h4><p class="product-price">€2.00</p><button class="btn_quantity" value="'+ products[i].id +'" onclick="addQuantity('+ products[i].id +')">+</button><a id="'+ products[i].id +'">0</a><button class="btn_quantity" onclick="removeQuantity('+ products[i].id +')">-</button><button class="product-btn" onclick="orderProduct('+products[i].id+')">Buy Now</button></div>';
+    element.appendChild(just_one);
+  }
+}
+
+
+function addQuantity(id){
+  var element = document.getElementById(id);
+  var value = parseInt(element.textContent);
+  value++;
+  //console.log(value);
+  element.textContent = value.toString();
+}
+
+function removeQuantity(id){
+  var element = document.getElementById(id);
+  var value = parseInt(element.textContent);
+  if(value > 0){
+    value--;
+  }
+  //console.log(value);
+  element.textContent = value.toString();
+}
+
+function orderProduct(id){
+  var element = document.getElementById(id);
+  if(parseInt(element.textContent) != 0){
+    addProductCart(value_session, id, parseInt(element.textContent));
   }
 }
 
@@ -185,7 +193,9 @@ function showLogin() {
   }
 }
 
-function showLoginForm() {}
+function showLoginForm() {
+  
+}
 
 function showRegistrationForm() {}
 
