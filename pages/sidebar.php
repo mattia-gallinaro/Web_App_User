@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 ?>
 
@@ -56,7 +57,7 @@
                 <span class="tooltip">Ordini</span>
             </li>
             <li>
-                <a onclick="showLogin()">
+                <a onclick="checkUserLogin()">
                     <i class='bx bxs-user-account'></i>
                     <span class="title">Profilo</span>
                 </a>
