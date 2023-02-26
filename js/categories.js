@@ -171,8 +171,8 @@ async function showCart() {
 */
 function showCartUser() {
   var price = null;
-  if (value_session == null || value_session != 0) {
-    showLogin();
+  if (value_session == null || value_session < 0) {
+    showLoginForm();
   } else {
     var cart = showCart().then((response) => {
       {
@@ -216,10 +216,13 @@ function showCartPriceFooter(price) {
   const element = document.createElement("footer");
   element.classList.add("sticky_bot");
   const button = document.createElement("button");
-  button.textContent = price.toString();
+  button.textContent = 'order';
   button.addEventListener("click", orderCartUser());
+  var text_cart = document.createElement("div");
+  text_cart.innerHTML = '<p>€' +price.toString();+'</p>';
   //element.innerHTML = '<button onclick="orderCartUser()>' + price + "</button>";
   parent_cat.appendChild(element);
+  element.appendChild(text_cart);
   element.appendChild(button);
 }
 
@@ -332,22 +335,32 @@ function saveSession(id){
     localStorage.setItem("user_id", id);
     value_session = localStorage.getItem("user_id");
 }
+
+
 function showRegistrationForm(){
 
 }
 
 function showCardUser() {
-  getInformation();
-  const element = document.createElement("div");
-  element.classList.add('card');
-  element.innerHTML = '<h1></h1><p class="title"></p><p></p><div style="margin: 24px 0;"><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-linkedin"></i></a><a href="#"><i class="fa fa-facebook"></i></a></div><p><button>Logout</button></p>';
-  parent_cat.appendChild(element);
+  var result = getInformation().then((user) => {
+    console.log(user);
+    var response = user.map(valueret());
+    console.log(response);
+    const element = document.createElement("div");
+    element.classList.add('card');
+    element.innerHTML = '<h1>'+user.name+ user.surname+'</h1><p class="title"></p><p></p><div style="margin: 24px 0;"><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-linkedin"></i></a><a href="#"><i class="fa fa-facebook"></i></a></div><p><button class="button-card">Logout</button></p>';
+    parent_cat.appendChild(element);
+  });
 }
 
+function valueret(val){
+  return val;
+}
 
 async function getInformation(){
   var response = await fetch('http://localhost/food-api/API/user/getUser.php?id=' + value_session)
   .then((response) => response.json())
-  .then((data) =>{console.log(data)});
+  .then((data) => {return (data)});
+  return response;
 }
 //function 
