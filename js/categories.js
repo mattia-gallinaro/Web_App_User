@@ -176,7 +176,9 @@ function showCartUser() {
   } else {
     var cart = showCart().then((response) => {
       {
+        getPickupBreak();
         const element = document.createElement("div");
+        element.setAttribute("id", "cart");
         element.classList.add("all-products");
         parent_cat.appendChild(element);
         console.log(response);
@@ -280,16 +282,16 @@ async function deleteItem(id, value) {
 
 function modifycartUser() {
   var element = document.getElementById("1_p");
-   fetch(
+  fetch(
     "http://localhost/food-api/API/cart/getUserCartPrice.php?user=" +
       value_session
   ).then((response) => {
     //console.log(response);
     var result = response.json();
     //console.log(result);
-    var test = Promise.resolve(result)
-    .then((result) => {element.textContent = "Il totale è: € " + result.prezzo + "";});
-
+    var test = Promise.resolve(result).then((result) => {
+      element.textContent = "Il totale è: € " + result.prezzo + "";
+    });
   });
 }
 
@@ -303,21 +305,43 @@ function showCartPriceFooter(price) {
   text_cart.innerHTML =
     '<p id="1_p">Il totale è: € ' +
     price.toString() +
-    '</p><button class="order-btn">Ordina</button>';
+    '</p><button class="order-btn" id="ordinare">Ordina</button>';
   //element.innerHTML = '<button onclick="orderCartUser()>' + price + "</button>";
   parent_cat.appendChild(element);
   element.appendChild(text_cart);
 }
 
-function getPickupBreak(){
-  
+async function getPickupBreak() {
+  var response = await fetch("http://localhost/food-api/API/order/pickup/getPickupBreak.php")
+    .then((response) => response.json())
+    .then((data) => {
+      var list = document.createElement("select");
+      list.setAttribute("id", "posizione");
+      parent_cat.appendChild(list);
+      for (var i = 0; i < data.length; i++) {
+        var single_option = document.createElement("option");
+        single_option.setAttribute("value", data[i].id1 + " " + data[i].id2);
+        single_option.textContent = data[i].name + " " + data[i].time;
+        list.appendChild(single_option);
+      }
+    });
+    var btn= document.getElementById("ordinare");
+    btn.addEventListener("click", orderCartUser());
 }
 
-function showOrderForm(){
-
-}
-
-function orderCartUser() {
+async function orderCartUser() {
+  var list = document.getElementById("posizione");
+  var result = list.options[list.selectedIndex].value;
+  console.log(result);
+  var json = {"user": value_session, "break": result.split()[1], "pickup": result.split()[0]}
+  await fetch("http://localhost/food-api/API/order/createOrderUser.php", {
+    method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(json),
+  })
+  .then((response) => {console.log(response.json())});
   //const element
 }
 
@@ -349,7 +373,7 @@ async function getOrders() {
     showLoginForm();
   } else {
     let response = await fetch(
-      "http://localhost/food-api/API/order/getActiveOrderByUser.php?id_user=" +
+      "http://localhost/food-api/API/order/getArchiveOrderByUser.php?id_user=" +
         value_session
     )
       .then((data) => data.json())
@@ -366,7 +390,7 @@ function showOrders(orders) {
   orders.map(function (orders) {
     console.log(orders.costo);
     const element = document.createElement("div");
-    element.textContent = orders.time + orders.name + orders.costo;
+      element.textContent += "Orario : " + orders.time + " Luogo di ritiro : "+ orders.name + " Prezzo : €"+ orders.costo;
     parent_cat.appendChild(element);
   });
 }
