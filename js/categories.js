@@ -183,6 +183,7 @@ function showCartUser() {
         for (var i = 0; i < response.length; i++) {
           var url = getImageUrl(response[i].tag_id);
           var just_one = document.createElement("div");
+          just_one.setAttribute("id", response[i].product + " a");
           just_one.classList.add("product");
           just_one.innerHTML =
             "<img src=" +
@@ -193,13 +194,15 @@ function showCartUser() {
             response[i].price +
             '</p><button class="btn_quantity" value="' +
             response[i].product +
-            '" onclick="addQuantity(' +
+            '" onclick="setAddQuantity(' +
             response[i].product +
-            ')">+</button><a id="' +
+            ')">+</button><a value="' +
+            response[i].product +
+            ' a" id="' +
             response[i].product +
             '">' +
             response[i].quantity +
-            '</a><button class="btn_quantity" onclick="removeQuantity(' +
+            '</a><button class="btn_quantity" onclick="setRemoveQuantity(' +
             response[i].product +
             ')">-</button></div>';
           element.appendChild(just_one);
@@ -212,18 +215,106 @@ function showCartUser() {
   }
 }
 
+async function setAddQuantity(id) {
+  addQuantity(id);
+  var json_body = { user: value_session, product: id };
+  await fetch("http://localhost/food-api/API/cart/setAdd.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(json_body),
+  })
+    .then((response) => {
+      modifycartUser();
+      //console.log(response.json());
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+async function setRemoveQuantity(id) {
+  var element = document.getElementById(id);
+  var value = parseInt(element.textContent);
+  if (value >= 2) {
+    removeQuantity(id);
+    var json_body = { user: value_session, prod: id };
+    await fetch("http://localhost/food-api/API/cart/setRemove.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(json_body),
+    })
+      .then((response) => {
+        modifycartUser();
+        console.log(response.json());
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  } else {
+    var value_id = element.getAttribute("value");
+    deleteItem(id, value_id);
+  }
+}
+
+async function deleteItem(id, value) {
+  await fetch(
+    "http://localhost/food-api/API/cart/deleteItem.php?user=" +
+      value_session +
+      "&product=" +
+      id
+  )
+    .then((response) => {
+      modifycartUser();
+      console.log(response.json());
+      var element = document.getElementById(value);
+      element.remove();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function modifycartUser() {
+  var element = document.getElementById("1_p");
+   fetch(
+    "http://localhost/food-api/API/cart/getUserCartPrice.php?user=" +
+      value_session
+  ).then((response) => {
+    //console.log(response);
+    var result = response.json();
+    //console.log(result);
+    var test = Promise.resolve(result)
+    .then((result) => {element.textContent = "Il totale è: € " + result.prezzo + "";});
+
+  });
+}
+
 function showCartPriceFooter(price) {
   const element = document.createElement("footer");
   element.classList.add("sticky_bot");
   const button = document.createElement("button");
-  button.textContent = 'order';
+  button.textContent = "order";
   button.addEventListener("click", orderCartUser());
   var text_cart = document.createElement("div");
-  text_cart.innerHTML = '<p>€' +price.toString();+'</p>';
+  text_cart.innerHTML =
+    '<p id="1_p">Il totale è: € ' +
+    price.toString() +
+    '</p><button class="order-btn">Ordina</button>';
   //element.innerHTML = '<button onclick="orderCartUser()>' + price + "</button>";
   parent_cat.appendChild(element);
   element.appendChild(text_cart);
-  element.appendChild(button);
+}
+
+function getPickupBreak(){
+  
+}
+
+function showOrderForm(){
+
 }
 
 function orderCartUser() {
@@ -254,15 +345,19 @@ function addProductCart(user, prod, quantity) {
 }
 
 async function getOrders() {
-  let response = await fetch(
-    "http://localhost/food-api/API/order/getActiveOrderByUser.php?id_user=" +
-      value_session
-  )
-    .then((data) => data.json())
-    .then((response) => {
-      console.log(response);
-      showOrders(response);
-    });
+  if (value_session == null || value_session < 0) {
+    showLoginForm();
+  } else {
+    let response = await fetch(
+      "http://localhost/food-api/API/order/getActiveOrderByUser.php?id_user=" +
+        value_session
+    )
+      .then((data) => data.json())
+      .then((response) => {
+        console.log(response);
+        showOrders(response);
+      });
+  }
 }
 
 function showOrders(orders) {
@@ -278,7 +373,7 @@ function showOrders(orders) {
 
 function checkUserLogin() {
   parent_cat.innerHTML = null;
-  if (value_session != null || value_session > 0) {
+  if (value_session == null || value_session > 0) {
     showCardUser();
   } else {
     showLoginForm();
@@ -290,11 +385,11 @@ function showTest() {
 }
 
 function showLoginForm() {
-    parent_cat.innerHTML = null;
-    const form = document.createElement("div");
-    form.innerHTML =
-      '<div class="form"><h1>Login</h1><input id="email" type="email" class="user" placeholder="Username"/><input id="password" type="password" class="pass"placeholder="Password"/><button class="login" onclick="login()">Login</button></div>';
-    parent_cat.appendChild(form);
+  parent_cat.innerHTML = null;
+  const form = document.createElement("div");
+  form.innerHTML =
+    '<div class="form"><h1>Login</h1><input id="email" type="email" class="user" placeholder="Username"/><input id="password" type="password" class="pass"placeholder="Password"/><button class="login" onclick="login()">Login</button></div>';
+  parent_cat.appendChild(form);
 }
 
 async function login() {
@@ -302,7 +397,7 @@ async function login() {
   const password_input = document.getElementById("password");
   //console.log(email_input.value);
   //console.log(password_input.value);
-  console.log(checkSession());
+  //console.log(checkSession());
   const json = { email: email_input.value, password: password_input.value };
   const response = await fetch("http://localhost/food-api/API/user/login.php", {
     method: "POST",
@@ -316,6 +411,7 @@ async function login() {
       console.log(data);
       if (data.response == true) {
         saveSession(data.userID);
+        window.location.reload();
       }
     })
     .catch((error) => {
@@ -331,36 +427,45 @@ function checkSession() {
   }
 }
 
-function saveSession(id){
-    localStorage.setItem("user_id", id);
-    value_session = localStorage.getItem("user_id");
+function saveSession(id) {
+  localStorage.setItem("user_id", id);
+  value_session = localStorage.getItem("user_id");
 }
 
-
-function showRegistrationForm(){
-
+function eliminateSession() {
+  console.log(localStorage.getItem("user_id"));
+  localStorage.removeItem("user_id");
+  window.location.reload();
+  //callCategory();
 }
+
+function showRegistrationForm() {}
 
 function showCardUser() {
   var result = getInformation().then((user) => {
     console.log(user);
-    var response = user.map(valueret());
-    console.log(response);
+    //var response = user.map(valueret());
+    //console.log(response);
     const element = document.createElement("div");
-    element.classList.add('card');
-    element.innerHTML = '<h1>'+user.name+ user.surname+'</h1><p class="title"></p><p></p><div style="margin: 24px 0;"><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-linkedin"></i></a><a href="#"><i class="fa fa-facebook"></i></a></div><p><button class="button-card">Logout</button></p>';
+    element.classList.add("card");
+    element.innerHTML =
+      '<h1>sudo ADMIN</h1><p class="title"></p><p></p><div style="margin: 24px 0;"><a href="#"><i class="fa fa-dribbble"></i></a><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-linkedin"></i></a><a href="#"><i class="fa fa-facebook"></i></a></div><p><button class="button-card" onclick="eliminateSession()">Logout</button></p>';
     parent_cat.appendChild(element);
   });
 }
 
-function valueret(val){
+function valueret(val) {
   return val;
 }
 
-async function getInformation(){
-  var response = await fetch('http://localhost/food-api/API/user/getUser.php?id=' + value_session)
-  .then((response) => response.json())
-  .then((data) => {return (data)});
+async function getInformation() {
+  var response = await fetch(
+    "http://localhost/food-api/API/user/getUser.php?id=" + value_session
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      return data;
+    });
   return response;
 }
-//function 
+//function
